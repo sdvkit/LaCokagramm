@@ -14,6 +14,106 @@
   }
 }
 
+.profileContainer {
+  background-color: #ddddf7;
+  padding: 20px;
+  height: 94vh;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+
+  .avatar {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #3e3c61;
+  }
+
+  .wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .username {
+    font-size: 25pt;
+    text-align: center;
+  }
+
+  .email {
+    font-size: 18pt;
+    text-align: center;
+  }
+  .uid {
+    font-size: 12pt;
+    text-align: center;
+  }
+}
+
+.postsContainer {
+  margin-top: 15px;
+  margin-left: 100px;
+  height: 90vh;
+  width: 35%;
+  overflow-y: scroll;
+
+  .stub {
+    text-align: center;
+  }
+
+  .post {
+    min-width: 400px;
+    border-radius: 10px;
+    margin-top: 15px;
+    background-color: white;
+    padding: 15px;
+
+    footer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+
+      .likeSection {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+        .like {
+          height: 20px;
+          width: 20px;
+          margin-left: 10px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    header {
+      display: flex;
+
+      .avatar {
+        height: 35px;
+        width: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #3e3c61;
+        margin-right: 10px;
+      } 
+
+      .info {
+        .email {
+          font-size: 10pt;
+        }
+      }
+    }
+  }
+}
+
+.postsContainer::-webkit-scrollbar {
+  display: none;
+}
+
 .formContainer {
   background-color: #a7bcff;
   height: 100vh;
@@ -126,6 +226,10 @@
           }
         }
 
+        .avatar {
+          cursor: pointer;
+        }
+
         .user {
           display: flex;
           gap: 10px;
@@ -221,6 +325,18 @@
         img {
           height: 24px;
           cursor: pointer;
+        }
+      }
+
+      button {
+        background-color: #5d5b8d;
+        color: #ddddf7;
+        font-size: 10px;
+        border: none;
+        cursor: pointer;
+        @include tablet {
+          position: absolute;
+          bottom: 10px;
         }
       }
 
