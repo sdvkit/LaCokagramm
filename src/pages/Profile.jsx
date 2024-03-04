@@ -20,6 +20,7 @@ const Profile = () => {
   const [postMessage, setPostMessage] = useState("");
   const [posts, setPosts] = useState([]);
   const [likes, setLikes] = useState([]);
+  const [followers, setFollowers] = useState([]);
 
   const getAuthenticatedUser = async () => {
     firebase.auth().onAuthStateChanged(user => {
@@ -71,7 +72,36 @@ const Profile = () => {
     })
   }
 
+  const observeFollowers = async () => {
+    const path = window.location.pathname.split('/');
+    const id = path[path.length - 1];
+
+    const docRef = firebase.firestore().collection("users").doc(`${id}`);
+    const docSnapshot = await docRef.get();
+
+    if (docSnapshot.exists) {
+      let data = docSnapshot.data()
+      setUserData(data);
+    
+      firebase.firestore().collection(`users/${data.uid}/followers`).onSnapshot(snapshot => {
+        let followers = snapshot.docs.map(doc => {
+          let data = doc.data()
+          return {
+            uid: data.uid
+          }
+        })
+  
+        setFollowers(followers)
+      })
+    }
+  }
+
   const sendPost = async () => {
+    if (/^\s*$/.test(postMessage)) {
+      alert("Can't create empty post")
+      return
+    }
+
     const collectionRef = firebase.firestore().collection(`users/${currentUser.uid}/posts`);
     
     await collectionRef.add({
@@ -81,6 +111,20 @@ const Profile = () => {
 
     setPostMessage("")
   }
+
+  const handleSubscribe = async () => {
+      const collectionRef = firebase.firestore().collection(`users/${userData.uid}/followers`)
+      
+      await collectionRef.doc(currentUser.uid).set({
+        uid: currentUser.uid 
+      })
+  }
+
+  const handleUnsubscribe = async () => {
+    const collectionRef = firebase.firestore().collection(`users/${userData.uid}/followers`)
+    
+    await collectionRef.doc(currentUser.uid).delete()
+}
 
   const handleLike = async (post) => {
     const collectionRef = firebase.firestore().collection(`users/${userData.uid}/posts/${post.id}/likes`);
@@ -94,12 +138,11 @@ const Profile = () => {
     const collectionRef = firebase.firestore().collection(`users/${userData.uid}/posts/${post.id}/likes`);
    
     await collectionRef.doc(currentUser.uid).delete()
-
-    console.log(likes);
   }
 
   useEffect(() => {
     getAuthenticatedUser()
+    observeFollowers()
     observePosts()
   }, [currentUser?.uid]);
 
@@ -111,6 +154,7 @@ const Profile = () => {
           <h2 className='username'>{userData.displayName}</h2>
           <span className='email'>{userData.email}</span>
           <span className='uid'>({userData.uid})</span>
+          <span className='followers'>Followers: {followers.length}</span>
 
           {userData.uid === currentUser.uid ? (
             <div>
@@ -125,7 +169,38 @@ const Profile = () => {
                 sendPost()
               }}>Post</button>
             </div>
-          ) : (<div />)}    
+          ) : (<div />)}  
+
+          {
+          (
+            followers.find(follower => follower.uid === currentUser.uid) === -1 
+            || followers.find(follower => follower.uid === currentUser.uid) === undefined
+          ) && currentUser.uid !== userData.uid ? (
+            <div>
+              <br />
+              <button onClick={() => {
+                  handleSubscribe()
+              }}>
+                Subsribe
+              </button>  
+            </div>
+          ): (<div/>)}
+
+{
+          (
+            followers.find(follower => follower.uid === currentUser.uid) !== -1 
+            && followers.find(follower => follower.uid === currentUser.uid) !== undefined
+          ) && currentUser.uid !== userData.uid ? (
+            <div>
+              <br />
+              <button onClick={() => {
+                  handleUnsubscribe()
+              }}>
+                Unsubscribe
+              </button>  
+            </div>
+          ): (<div/>)}
+
         </div>
       ) : (<div />)}
       <div className='postsContainer'>

@@ -21,6 +21,11 @@ const Input = () => {
   const { data } = useContext(ChatContext);
 
   const handleSend = async () => {
+    if (/^\s*$/.test(text)) {
+      alert("Can't send empty message")
+      return
+    }
+
     if (img) {
       const storageRef = ref(storage, uuid());
 
